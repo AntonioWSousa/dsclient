@@ -10,6 +10,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.projectdev.dsclient.dto.ClientDTO;
 import com.projectdev.dsclient.entities.Client;
+import com.projectdev.dsclient.exceptions.ResourceNotFoundException;
 import com.projectdev.dsclient.repositories.ClientRepository;
 
 @Service
@@ -27,7 +28,7 @@ public class ClientService {
 	@Transactional(readOnly = true)
 	public ClientDTO findById(Long id) {
 		Optional<Client> obj = repository.findById(id);
-		Client entity = obj.get();
+		Client entity = obj.orElseThrow(() -> new ResourceNotFoundException("Não foi possível concluir sua busca, porque o ID requisitado não existe na base de dados."));
 		return new ClientDTO(entity);
 	}
 
