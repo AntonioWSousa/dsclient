@@ -7,11 +7,14 @@ import java.util.stream.Collectors;
 import javax.persistence.EntityNotFoundException;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.projectdev.dsclient.dto.ClientDTO;
 import com.projectdev.dsclient.entities.Client;
+import com.projectdev.dsclient.exceptions.DatabaseException;
 import com.projectdev.dsclient.exceptions.ResourceNotFoundException;
 import com.projectdev.dsclient.repositories.ClientRepository;
 
@@ -59,7 +62,19 @@ public class ClientService {
 			return new ClientDTO(entity);
 		}
 		catch (EntityNotFoundException e){
-			throw new ResourceNotFoundException("ID não encontrado. " + id);
+			throw new ResourceNotFoundException("ID " + id + " não encontrado.");
+		}
+	}
+
+	public void delete(Long id) {
+		try {
+			repository.deleteById(id);
+		}
+		catch (EmptyResultDataAccessException e) {
+			throw new ResourceNotFoundException("ID " + id + " não encontrado.");
+		}
+		catch (DataIntegrityViolationException e) {
+			throw new DatabaseException("Violação de integridade.");
 		}
 	} 
 
